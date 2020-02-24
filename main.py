@@ -17,6 +17,8 @@ class MapWindow(QWidget):
         uic.loadUi('map.ui', self)
         self.spn = '0.005'
         self.ll = ['40.951714', '57.777134']
+        self.l = "map"
+        self.buttonGroup.buttonClicked.connect(self.change_view)
         self.get_map()
         self.initUi()
 
@@ -27,7 +29,7 @@ class MapWindow(QWidget):
         address = self.findLine.text()
         geo_name = f"http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode={address}&format=json"
         response = requests.get(geo_name)
-        json_response = response.json()    
+        json_response = response.json()
         toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
         toponym_coordinates = toponym["Point"]["pos"]
         self.ll = toponym_coordinates.split()
@@ -38,25 +40,25 @@ class MapWindow(QWidget):
             map_params = {
                 "ll": ",".join([self.ll[0], self.ll[1]]),
                 "spn": ",".join([self.spn, self.spn]),
-                "l": "map",
+                "l": self.l,
             }
         else:
             map_params = {
                 "ll": ",".join([self.ll[0], self.ll[1]]),
                 "spn": ",".join([self.spn, self.spn]),
-                "l": "map",
+                "l": self.l,
                 "pt": pt,
-            }            
+            }
 
         map_api_server = "http://static-maps.yandex.ru/1.x/"
         response = requests.get(map_api_server, params=map_params)
-        self.map_file = 'map.png'
+        self.map_file = 'map'
         with open(self.map_file, "wb") as file:
             file.write(response.content)
         self.paint_map()
 
     def paint_map(self):
-        self.pixmap = QPixmap('map.png')
+        self.pixmap = QPixmap('map')
         self.label.setPixmap(self.pixmap)
 
     def keyPressEvent(self, event):
@@ -75,9 +77,18 @@ class MapWindow(QWidget):
         os.remove(self.map_file)
         self.get_map()
 
+    def change_view(self, sender):
+        if sender.text() == 'Схема':
+            self.l = 'map'
+        elif sender.text() == 'Гибрид':
+            self.l = 'sat,skl'
+        else:
+            self.l = 'sat'
+        self.get_map()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = MapWindow()
     ex.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

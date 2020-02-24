@@ -23,6 +23,7 @@ class MapWindow(QWidget):
                 "l": "map",
             }
         self.l = "map"
+        self.code = ""
         self.get_map()
         self.initUi()
 
@@ -30,6 +31,13 @@ class MapWindow(QWidget):
         self.findButton.clicked.connect(self.findFunc)
         self.buttonGroup.buttonClicked.connect(self.change_view)
         self.pushButton.clicked.connect(self.del_pt)
+        self.checkBox.stateChanged.connect(self.post_code_show)
+
+    def post_code_show(self, state):
+        if state == Qt.Checked:
+            self.address.setText(self.address.text() + "\t" + self.code)
+        else:
+            self.address.setText(self.address.text().split("\t")[0])
 
     def del_pt(self):
         if "pt" in self.map_params.keys():
@@ -44,10 +52,21 @@ class MapWindow(QWidget):
         toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
         toponym_coordinates = toponym["Point"]["pos"]
         self.address.setText(toponym["metaDataProperty"]["GeocoderMetaData"]["text"])
+        try:
+            self.code = toponym["metaDataProperty"]["GeocoderMetaData"]["Address"]["postal_code"]
+        except Exception:
+            pass
         self.ll = toponym_coordinates.split()
         self.get_map(f"{','.join(self.ll)},pm2lbm1")
 
     def get_map(self, pt=None):
+        if "pt" in self.map_params:
+            self.map_params = {
+                "ll": ",".join([self.ll[0], self.ll[1]]),
+                "spn": ",".join([self.spn, self.spn]),
+                "l": self.l,
+                "pt": self.map_params["pt"],
+            }
         if pt is not None:
             self.map_params = {
                 "ll": ",".join([self.ll[0], self.ll[1]]),
@@ -97,9 +116,9 @@ class MapWindow(QWidget):
         self.get_map()
 
     def change_view(self, sender):
-        if sender.text() == '√ë√µ√•√¨√†':
+        if sender.text() == '—ıÂÏ‡':
             self.l = 'map'
-        elif sender.text() == '√É√®√°√∞√®√§':
+        elif sender.text() == '√Ë·Ë‰':
             self.l = 'sat,skl'
         else:
             self.l = 'sat'

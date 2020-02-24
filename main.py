@@ -48,13 +48,6 @@ class MapWindow(QWidget):
         self.get_map(f"{','.join(self.ll)},pm2lbm1")
 
     def get_map(self, pt=None):
-        if "pt" in self.map_params:
-            self.map_params = {
-                "ll": ",".join([self.ll[0], self.ll[1]]),
-                "spn": ",".join([self.spn, self.spn]),
-                "l": self.l,
-                "pt": self.map_params["pt"],
-            }
         if pt is not None:
             self.map_params = {
                 "ll": ",".join([self.ll[0], self.ll[1]]),
@@ -104,9 +97,9 @@ class MapWindow(QWidget):
         self.get_map()
 
     def change_view(self, sender):
-        if sender.text() == '—ıÂÏ‡':
+        if sender.text() == '√ë√µ√•√¨√†':
             self.l = 'map'
-        elif sender.text() == '√Ë·Ë‰':
+        elif sender.text() == '√É√®√°√∞√®√§':
             self.l = 'sat,skl'
         else:
             self.l = 'sat'

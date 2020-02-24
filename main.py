@@ -17,24 +17,25 @@ class MapWindow(QWidget):
         uic.loadUi('map.ui', self)
         self.spn = '0.005'
         self.ll = ['40.951714', '57.777134']
-        self.map_params = {
-                "ll": ",".join([self.ll[0], self.ll[1]]),
-                "spn": ",".join([self.spn, self.spn]),
-                "l": "map",
-            }
         self.l = "map"
+        self.map_params = {
+            "ll": ",".join([self.ll[0], self.ll[1]]),
+            "spn": ",".join([self.spn, self.spn]),
+            "l": "map",
+        }
         self.get_map()
         self.initUi()
 
     def initUi(self):
         self.findButton.clicked.connect(self.findFunc)
+        self.pushButton.clicked.connect(self.del_pt)
         self.buttonGroup.buttonClicked.connect(self.change_view)
 
     def findFunc(self):
         address = self.findLine.text()
         geo_name = f"http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode={address}&format=json"
         response = requests.get(geo_name)
-        json_response = response.json()    
+        json_response = response.json()
         toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
         toponym_coordinates = toponym["Point"]["pos"]
         self.ll = toponym_coordinates.split()
@@ -90,17 +91,22 @@ class MapWindow(QWidget):
         self.get_map()
 
     def change_view(self, sender):
-        if sender.text() == '—ıÂÏ‡':
+        if sender.text() == '–°—Ö–µ–º–∞':
             self.l = 'map'
-        elif sender.text() == '√Ë·Ë‰':
+        elif sender.text() == '–ì–∏–±—Ä–∏–¥':
             self.l = 'sat,skl'
         else:
             self.l = 'sat'
-        self.get_map()    
+        self.get_map()
+
+    def del_pt(self):
+        if "pt" in self.map_params.keys():
+            del(self.map_params["pt"])
+        self.get_map()
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = MapWindow()
     ex.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

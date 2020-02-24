@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>611</width>
+    <width>784</width>
     <height>559</height>
    </rect>
   </property>
@@ -108,6 +108,19 @@
    <attribute name="buttonGroup">
     <string notr="true">buttonGroup</string>
    </attribute>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>610</x>
+     <y>12</y>
+     <width>171</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Сброс поискового результата</string>
+   </property>
   </widget>
  </widget>
  <resources/>

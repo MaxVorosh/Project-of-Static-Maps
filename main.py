@@ -18,13 +18,35 @@ class MapWindow(QWidget):
         self.spn = '0.005'
         self.ll = ['40.951714', '57.777134']
         self.get_map()
+        self.initUi()
 
-    def get_map(self):
-        map_params = {
-            "ll": ",".join([self.ll[0], self.ll[1]]),
-            "spn": ",".join([self.spn, self.spn]),
-            "l": "map",
-        }
+    def initUi(self):
+        self.findButton.clicked.connect(self.findFunc)
+
+    def findFunc(self):
+        address = self.findLine.text()
+        geo_name = f"http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode={address}&format=json"
+        response = requests.get(geo_name)
+        json_response = response.json()    
+        toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+        toponym_coordinates = toponym["Point"]["pos"]
+        self.ll = toponym_coordinates.split()
+        self.get_map(f"{','.join(self.ll)},pm2lbm1")
+
+    def get_map(self, pt=None):
+        if pt is None:
+            map_params = {
+                "ll": ",".join([self.ll[0], self.ll[1]]),
+                "spn": ",".join([self.spn, self.spn]),
+                "l": "map",
+            }
+        else:
+            map_params = {
+                "ll": ",".join([self.ll[0], self.ll[1]]),
+                "spn": ",".join([self.spn, self.spn]),
+                "l": "map",
+                "pt": pt,
+            }            
 
         map_api_server = "http://static-maps.yandex.ru/1.x/"
         response = requests.get(map_api_server, params=map_params)
@@ -58,4 +80,4 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = MapWindow()
     ex.show()
-    sys.exit(app.exec())
+    sys.exit(app.exec_())

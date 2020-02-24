@@ -17,41 +17,53 @@ class MapWindow(QWidget):
         uic.loadUi('map.ui', self)
         self.spn = '0.005'
         self.ll = ['40.951714', '57.777134']
+        self.map_params = {
+                "ll": ",".join([self.ll[0], self.ll[1]]),
+                "spn": ",".join([self.spn, self.spn]),
+                "l": "map",
+            }
         self.l = "map"
-        self.buttonGroup.buttonClicked.connect(self.change_view)
         self.get_map()
         self.initUi()
 
     def initUi(self):
         self.findButton.clicked.connect(self.findFunc)
+        self.buttonGroup.buttonClicked.connect(self.change_view)
 
     def findFunc(self):
         address = self.findLine.text()
         geo_name = f"http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode={address}&format=json"
         response = requests.get(geo_name)
-        json_response = response.json()
+        json_response = response.json()    
         toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
         toponym_coordinates = toponym["Point"]["pos"]
         self.ll = toponym_coordinates.split()
         self.get_map(f"{','.join(self.ll)},pm2lbm1")
 
     def get_map(self, pt=None):
-        if pt is None:
-            map_params = {
+        if "pt" in self.map_params:
+            self.map_params = {
                 "ll": ",".join([self.ll[0], self.ll[1]]),
                 "spn": ",".join([self.spn, self.spn]),
                 "l": self.l,
+                "pt": self.map_params["pt"],
             }
-        else:
-            map_params = {
+        elif pt is not None:
+            self.map_params = {
                 "ll": ",".join([self.ll[0], self.ll[1]]),
                 "spn": ",".join([self.spn, self.spn]),
                 "l": self.l,
                 "pt": pt,
             }
+        else:
+            self.map_params = {
+                "ll": ",".join([self.ll[0], self.ll[1]]),
+                "spn": ",".join([self.spn, self.spn]),
+                "l": self.l,
+            }
 
         map_api_server = "http://static-maps.yandex.ru/1.x/"
-        response = requests.get(map_api_server, params=map_params)
+        response = requests.get(map_api_server, params=self.map_params)
         self.map_file = 'map'
         with open(self.map_file, "wb") as file:
             file.write(response.content)
@@ -78,17 +90,17 @@ class MapWindow(QWidget):
         self.get_map()
 
     def change_view(self, sender):
-        if sender.text() == '–°—Ö–µ–º–∞':
+        if sender.text() == '—ıÂÏ‡':
             self.l = 'map'
-        elif sender.text() == '–ì–∏–±—Ä–∏–¥':
+        elif sender.text() == '√Ë·Ë‰':
             self.l = 'sat,skl'
         else:
             self.l = 'sat'
-        self.get_map()
+        self.get_map()    
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = MapWindow()
     ex.show()
-    sys.exit(app.exec())
+    sys.exit(app.exec_())
